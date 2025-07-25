@@ -4,8 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import (auc, confusion_matrix,
-                             precision_recall_fscore_support, roc_curve)
+from sklearn.metrics import auc, precision_recall_fscore_support, roc_curve
 from sklearn.preprocessing import label_binarize
 
 def calculate_test_metrics_for_fold(true_labels, predicted_labels, model_scores):
@@ -14,18 +13,18 @@ def calculate_test_metrics_for_fold(true_labels, predicted_labels, model_scores)
     
     accuracy = (predicted_labels == true_labels).mean()
     
-    precision, recall, f1_score, class_sample_counts = precision_recall_fscore_support(
+    precision, recall, f1_score, _ = precision_recall_fscore_support(
         true_labels, predicted_labels, average=None, labels=list(range(number_of_classes)), zero_division=0
     )
     
-    macro_precision, macro_recall, macro_f1, macro_support = precision_recall_fscore_support(
+    macro_precision, macro_recall, macro_f1, _ = precision_recall_fscore_support(
         true_labels, predicted_labels, average='macro', labels=list(range(number_of_classes)), zero_division=0
     )
 
-    weighted_precision, weighted_recall, weighted_f1, weighted_support = precision_recall_fscore_support(
+    weighted_precision, weighted_recall, weighted_f1, _ = precision_recall_fscore_support(
         true_labels, predicted_labels, average='weighted', labels=list(range(number_of_classes)), zero_division=0
     )
-    
+        
     fold_results_dict = {
         'test_accuracy': accuracy,
         'macro_precision': macro_precision, 'macro_recall': macro_recall, 'macro_f1': macro_f1,
@@ -36,7 +35,7 @@ def calculate_test_metrics_for_fold(true_labels, predicted_labels, model_scores)
     roc_curve_data_for_fold = []
 
     for class_index, class_name in enumerate(class_names):
-        false_positive_rate, true_positive_rate, thresholds = roc_curve(
+        false_positive_rate, true_positive_rate, _ = roc_curve(
             one_hot_encoded_labels[:, class_index], model_scores[:, class_index]
         )
         roc_area_under_curve = auc(false_positive_rate, true_positive_rate)
@@ -107,7 +106,7 @@ def generate_and_save_summary_report(all_fold_results, total_confusion_matrix, a
         std_auc = np.std(aucs_for_class)
         
         plt.plot(mean_false_positive_rate, mean_tpr, lw=2, 
-                 label=f'{class_name} (AUC = {mean_auc:.2f} ± {std_auc:.2f})')
+                label=f'{class_name} (AUC = {mean_auc:.2f} ± {std_auc:.2f})')
 
 
     plt.xlabel('False Positive Rate')

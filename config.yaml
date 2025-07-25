@@ -1,0 +1,9 @@
+data_folder: "data_raw"
+cvind_path: "cvind.mat"
+
+batch_size: 32
+head_epochs: 3
+max_epochs: 50
+patience: 5
+seed: 42
+num_workers: 4

@@ -10,7 +10,7 @@ from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from model import create_brain_tumour_model
-from gradcam_config import CLASS_NAMES
+from class_names import class_names
 from gradcam_utils import prepare_image_for_model
 
 
@@ -20,7 +20,7 @@ def main():
     parser.add_argument('--experiment_folder', type=str, required=True, 
                         help='Name of the experiment folder, e.g., "resnet50_finetune_adam_lr-0.0001".')
     parser.add_argument('--fold_number', type=int, required=True,
-                        help="The fold number of the model you want to use (e.g., 1).")
+                        help="The fold number of the model you  want to use (e.g., 1).")
     parser.add_argument('--model_type', type=str, required=True, choices=['resnet18', 'resnet50'],
                         help="The model architecture, e.g., 'resnet50'.")
     parser.add_argument('--image_path', type=str, required=True, 
@@ -55,9 +55,9 @@ def main():
     output_scores = torch.softmax(model(model_input), dim=1)
     predicted_label_index = output_scores.argmax().item()
     
-    predicted_class_name = CLASS_NAMES.get(predicted_label_index)
-    true_class_name = CLASS_NAMES.get(true_label_index)
-    
+    predicted_class_name = class_names.get(predicted_label_index)
+    true_class_name = class_names.get(true_label_index)
+
     output_directory = "gradcam_outputs"
     os.makedirs(output_directory, exist_ok=True)
     

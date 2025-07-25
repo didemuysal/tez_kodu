@@ -56,26 +56,39 @@ def train_fold(model, train_loader, val_loader, criterion, args, device):
 
         head_optimizer = get_optimizer(model.fc.parameters(), args.optimizer, args.lr)
         
-        print(f"Stage 1: Training only the head for {args.head_epochs}")
+        print(f"Stage 1 (Finetune): Training only the head for {args.head_epochs} epochs.")
         for epoch in range(args.head_epochs):
             run_one_epoch(model, train_loader, criterion, head_optimizer, device)
+        
+        for param in model.parameters():
+            param.requires_grad = True
 
-    for param in model.parameters():
-        param.requires_grad = True
-    
-    if args.strategy == 'finetune':
-        fine_tune_lr = args.lr / 10.0
+        main_lr = args.lr / 10.0
+        main_optimizer = get_optimizer(model.parameters(), args.optimizer, main_lr)
+        print(f"Stage 2 (Finetune): Training full network for {args.max_epochs} epochs.")
+
+    elif args.strategy == 'baseline':
+        for param in model.parameters():
+            param.requires_grad = False
+        for param in model.fc.parameters():
+            param.requires_grad = True
+        
+        main_lr = args.lr
+        main_optimizer = get_optimizer(model.fc.parameters(), args.optimizer, main_lr)
+        print(f"Strategy (FFE): Training only the head for {args.max_epochs} epochs.")
+
     else:
-        fine_tune_lr = args.lr
+        for param in model.parameters():
+            param.requires_grad = True
+        
+        main_lr = args.lr
+        main_optimizer = get_optimizer(model.parameters(), args.optimizer, main_lr)
+        print(f"Strategy ({args.strategy}): Training full network (no head warm-up) for {args.max_epochs} epochs.")
 
-    full_optimizer = get_optimizer(model.parameters(), args.optimizer, fine_tune_lr)
-
-    print(f"Stage 2: Training full network for {args.max_epochs}")
     for epoch in range(args.max_epochs):
-        run_one_epoch(model, train_loader, criterion, full_optimizer, device)
+        run_one_epoch(model, train_loader, criterion, main_optimizer, device)
         
         validation_loss, validation_labels, validation_predictions, validation_scores = run_one_epoch(model, val_loader, criterion, None, device)
-
 
         print(f"  Epoch {epoch+1}/{args.max_epochs} -> Validation Loss: {validation_loss:.4f}")
 
@@ -85,11 +98,9 @@ def train_fold(model, train_loader, val_loader, criterion, args, device):
             best_model_state = copy.deepcopy(model.state_dict())
         else:
             epochs_no_improve += 1
-            
             print(f"  -> No improvement for {epochs_no_improve} epoch(s).")
-            
             if epochs_no_improve >= args.patience:
-                print(f"Early stopped after {args.patience} epochs")
+                print(f"Early stopped after {args.patience} epochs.")
                 break
-            
+        
     return best_model_state
