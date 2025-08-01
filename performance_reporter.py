@@ -14,16 +14,13 @@ def calculate_test_metrics_for_fold(true_labels, predicted_labels, model_scores)
     accuracy = (predicted_labels == true_labels).mean()
     
     precision, recall, f1_score, _ = precision_recall_fscore_support(
-        true_labels, predicted_labels, average=None, labels=list(range(number_of_classes)), zero_division=0
-    )
+        true_labels, predicted_labels, average=None, labels=list(range(number_of_classes)), zero_division=0)
     
     macro_precision, macro_recall, macro_f1, _ = precision_recall_fscore_support(
-        true_labels, predicted_labels, average='macro', labels=list(range(number_of_classes)), zero_division=0
-    )
+        true_labels, predicted_labels, average='macro', labels=list(range(number_of_classes)), zero_division=0)
 
     weighted_precision, weighted_recall, weighted_f1, _ = precision_recall_fscore_support(
-        true_labels, predicted_labels, average='weighted', labels=list(range(number_of_classes)), zero_division=0
-    )
+        true_labels, predicted_labels, average='weighted', labels=list(range(number_of_classes)), zero_division=0)
         
     fold_results_dict = {
         'test_accuracy': accuracy,
@@ -57,7 +54,7 @@ def generate_and_save_summary_report(all_fold_results, total_confusion_matrix, a
     std_dev_metrics = results_dataframe.drop(columns=['fold']).std()
 
     summary_df = pd.DataFrame({'Mean': mean_metrics, 'Std Dev': std_dev_metrics})
-    print("\n--- Cross-Validation Complete ---")
+    print("\n ---------------Cross-Validation Complete ---------------")
     print("Mean and Std Dev of Performance Metrics Across 5 Folds:")
     print(summary_df)
 

@@ -6,4 +6,4 @@ head_epochs: 3
 max_epochs: 50
 patience: 5
 seed: 42
-num_workers: 4
+num_workers: 0

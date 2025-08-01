@@ -39,6 +39,7 @@ class BrainTumourDataset(Dataset):
 
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, int]: 
         filepath = os.path.join(self.data_folder, self.filenames[index])
+
         with h5py.File(filepath, "r") as f:
             image = f["cjdata"]["image"][()]
         image = image.astype(np.float32)

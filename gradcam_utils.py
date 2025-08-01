@@ -12,14 +12,13 @@ def prepare_image_for_model(path_to_mat_file):
     processed_image_data_for_model = image_data.astype(np.float32)
     processed_image_data_for_model /= processed_image_data_for_model.max()
 
-    # This part prepares the image for visualization with Grad-CAM
+    
     image_for_visualization = np.uint8(255 * image_data / image_data.max())
     image_for_visualization = cv2.cvtColor(image_for_visualization, cv2.COLOR_GRAY2RGB)
     image_for_visualization = cv2.resize(image_for_visualization, (224, 224))
     image_for_visualization = np.float32(image_for_visualization) / 255
 
-    # This part applies the same transformations used during training
-    # to prepare the image for input to the model
+    
     training_transforms = transforms.Compose([
         transforms.ToPILImage(),
         transforms.Grayscale(num_output_channels=3),
